@@ -286,18 +286,25 @@ func (f *File) parse(reader io.Reader) (err error) {
 			kname = "#" + strconv.Itoa(p.count)
 			p.count++
 		}
-
-		key, err := section.NewKey(kname, "")
-		if err != nil {
-			return err
-		}
-		key.isAutoIncr = isAutoIncr
-
 		value, err := p.readValue(line[offset:])
 		if err != nil {
 			return err
 		}
-		key.SetValue(value)
+		var key *Key
+		if strings.HasSuffix(kname, "[]") {
+			// Append
+			kname = strings.TrimSuffix(kname, "[]")
+			if key = section.Key(kname); key != nil {
+				key.AddValue(value)
+			}
+		} else {
+			// Set
+			if key, err = section.NewKey(kname, ""); err != nil {
+				return err
+			}
+			key.isAutoIncr = isAutoIncr
+			key.SetValue(value)
+		}
 		key.Comment = strings.TrimSpace(p.comment.String())
 		p.comment.Reset()
 	}

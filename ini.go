@@ -112,6 +112,7 @@ type Key struct {
 	Comment    string
 	name       string
 	value      string
+	values     []string
 	isAutoIncr bool
 }
 
@@ -127,32 +128,40 @@ func (k *Key) Value() string {
 
 // String returns string representation of value.
 func (k *Key) String() string {
-	val := k.value
+	return k.string(k.value)
+}
+
+func (k *Key) string(val string) string {
 	if strings.Index(val, "{") == -1 {
 		return val
 	}
-
 	for i := 0; i < _DEPTH_VALUES; i++ {
 		vr := varPattern.FindString(val)
 		if len(vr) == 0 {
 			break
 		}
-
-		// Take off leading '%(' and trailing ')s'.
-		noption := strings.TrimLeft(vr, "{")
-		noption = strings.TrimRight(noption, "}")
-
+		// Take off leading '{' and trailing '}'.
+		nOption := strings.TrimLeft(vr, "{")
+		nOption = strings.TrimRight(nOption, "}")
 		// Search in the same section.
-		nk, err := k.s.GetKey(noption)
+		nk, err := k.s.GetKey(nOption)
 		if err != nil {
 			// Search again in default section.
-			nk, _ = k.s.f.Section("").GetKey(noption)
+			nk, _ = k.s.f.Section("").GetKey(nOption)
 		}
-
 		// Substitute by new value and take off leading '{' and trailing '}'.
 		val = strings.Replace(val, vr, nk.value, -1)
 	}
 	return val
+}
+
+// StringValues returns slice of string representation of values
+func (k *Key) StringValues() []string {
+	values := []string{}
+	for _, s := range k.values {
+		values = append(values, k.string(s))
+	}
+	return values
 }
 
 // Validate accepts a validate function which can
@@ -700,6 +709,15 @@ func (k *Key) SetValue(v string) {
 	k.s.keysHash[k.name] = v
 }
 
+func (k *Key) AddValue(v string) {
+	if k.s.f.BlockMode {
+		k.s.f.lock.Lock()
+		defer k.s.f.lock.Unlock()
+	}
+	k.values = append(k.values, v)
+	k.s.keysHash[k.name] = v
+}
+
 //   _________              __  .__
 //  /   _____/ ____   _____/  |_|__| ____   ____
 //  \_____  \_/ __ \_/ ___\   __\  |/  _ \ /    \
@@ -743,7 +761,7 @@ func (s *Section) NewKey(name, val string) (*Key, error) {
 	}
 
 	s.keyList = append(s.keyList, name)
-	s.keys[name] = &Key{s, "", name, val, false}
+	s.keys[name] = &Key{s, "", name, val, []string{val}, false}
 	s.keysHash[name] = val
 	return s.keys[name], nil
 }
