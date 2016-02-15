@@ -36,7 +36,7 @@ NAME = ini
 ; Package version
 VERSION = v1
 ; Package import path
-IMPORT_PATH = gopkg.in/%(NAME)s.%(VERSION)s
+IMPORT_PATH = gopkg.in/{NAME}.{VERSION}
 
 # Information about package author
 # Bio can be written in multiple lines.
@@ -50,7 +50,7 @@ Good man.
 """  # Succeeding comment
 
 [package]
-CLONE_URL = https://%(IMPORT_PATH)s
+CLONE_URL = https://{IMPORT_PATH}
 
 [package.sub]
 UNUSED_KEY = should be deleted

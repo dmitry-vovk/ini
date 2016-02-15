@@ -44,8 +44,8 @@ func Version() string {
 var (
 	LineBreak = "\n"
 
-	// Variable regexp pattern: %(variable)s
-	varPattern = regexp.MustCompile(`%\(([^\)]+)\)s`)
+	// Variable regexp pattern: {vari.able}
+	varPattern = regexp.MustCompile(`{[^}]+}`)
 
 	// Write spaces around "=" to look better.
 	PrettyFormat = true
@@ -128,7 +128,7 @@ func (k *Key) Value() string {
 // String returns string representation of value.
 func (k *Key) String() string {
 	val := k.value
-	if strings.Index(val, "%") == -1 {
+	if strings.Index(val, "{") == -1 {
 		return val
 	}
 
@@ -139,8 +139,8 @@ func (k *Key) String() string {
 		}
 
 		// Take off leading '%(' and trailing ')s'.
-		noption := strings.TrimLeft(vr, "%(")
-		noption = strings.TrimRight(noption, ")s")
+		noption := strings.TrimLeft(vr, "{")
+		noption = strings.TrimRight(noption, "}")
 
 		// Search in the same section.
 		nk, err := k.s.GetKey(noption)
@@ -149,7 +149,7 @@ func (k *Key) String() string {
 			nk, _ = k.s.f.Section("").GetKey(noption)
 		}
 
-		// Substitute by new value and take off leading '%(' and trailing ')s'.
+		// Substitute by new value and take off leading '{' and trailing '}'.
 		val = strings.Replace(val, vr, nk.value, -1)
 	}
 	return val
