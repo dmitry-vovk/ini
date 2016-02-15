@@ -143,12 +143,8 @@ func (k *Key) string(val string) string {
 		// Take off leading '{' and trailing '}'.
 		nOption := strings.TrimLeft(vr, "{")
 		nOption = strings.TrimRight(nOption, "}")
-		// Search in the same section.
-		nk, err := k.s.GetKey(nOption)
-		if err != nil {
-			// Search again in default section.
-			nk, _ = k.s.f.Section("").GetKey(nOption)
-		}
+		parts := strings.SplitN(nOption, ".", 2)
+		nk, _ := k.s.f.Section(parts[0]).GetKey(parts[1])
 		// Substitute by new value and take off leading '{' and trailing '}'.
 		val = strings.Replace(val, vr, nk.value, -1)
 	}
