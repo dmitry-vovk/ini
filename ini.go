@@ -31,10 +31,10 @@ import (
 
 const (
 	DEFAULT_SECTION = "DEFAULT"
-	// Maximum allowed depth when recursively substituing variable names.
+	// Maximum allowed depth when recursively substituting variable names.
 	_DEPTH_VALUES = 99
 
-	_VERSION = "1.9.0"
+	_VERSION = "1.0.0"
 )
 
 func Version() string {

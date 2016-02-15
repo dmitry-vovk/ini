@@ -43,7 +43,7 @@ IMPORT_PATH = gopkg.in/{NAME}.{VERSION}
 [author]
 NAME = Unknwon  ; Succeeding comment
 E-MAIL = fake@localhost
-GITHUB = https://github.com/%(NAME)s
+GITHUB = https://github.com/{NAME}
 BIO = """Gopher.
 Coding addict.
 Good man.

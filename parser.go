@@ -26,13 +26,6 @@ import (
 
 type tokenType int
 
-const (
-	_TOKEN_INVALID tokenType = iota
-	_TOKEN_COMMENT
-	_TOKEN_SECTION
-	_TOKEN_KEY
-)
-
 type parser struct {
 	buf     *bufio.Reader
 	isEOF   bool
